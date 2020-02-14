@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { StackActions, NavigationActions } from 'react-navigation';
-// import AsyncStorage from '@react-native-community/async-storage';
 
 YellowBox.ignoreWarnings(['AsyncStorage has been extracted']);
 
@@ -28,17 +27,18 @@ export interface ILoadingScreen {
 }
 
 class LoadingScreen extends React.Component<ILoadingScreen> {
-  state = { logs: [] };
   async componentDidMount() {
     if (Platform.OS === 'ios')
       StatusBar.setNetworkActivityIndicatorVisible(true);
     await this.prepareDataFromStorage();
-    // await this.props.fetchAllCards();
-    // this.resetStack();
     if (Platform.OS === 'ios')
       StatusBar.setNetworkActivityIndicatorVisible(false);
   }
 
+  /**
+   * This function will get prepare data from storage and prepare for redux.
+   * if data does not exists, Api will fetch data and prepare for storage and redux.
+   */
   prepareDataFromStorage = async fetchData => {
     this.props.setIndicator({
       visible: true,
@@ -90,17 +90,10 @@ class LoadingScreen extends React.Component<ILoadingScreen> {
   render() {
     return (
       <CView center middle flex>
-        {this.state.logs.map(d => (
-          <CText size={15}>{d}</CText>
-        ))}
-        {this.state.logs.length === 0 && (
-          <>
-            <CText size={25}>Please wait</CText>
-            <CText color="red" size={20}>
-              This may take few minutes
-            </CText>
-          </>
-        )}
+        <CText size={25}>Please wait</CText>
+        <CText color="red" size={20}>
+          This may take few minutes
+        </CText>
       </CView>
     );
   }
@@ -114,6 +107,7 @@ const dispatchToProps = dispatch => ({
       payload: { cardListStatus: true },
     });
 
+    // Screen activity indicator (custom)
     dispatch({
       type: ACTION_SET_ACTIVITY_INDICATOR,
       payload: { visible: true, message: 'It may take minutes, please wait..' },
@@ -144,9 +138,10 @@ const dispatchToProps = dispatch => ({
             JSON.stringify(cardDataForStorage),
           ).then(() => console.log(`${storageKey} sync...`));
         }
-      }
 
-      await delay(0.5);
+        // Api delay between card sets
+        await delay(0.2);
+      }
 
       dispatch({
         type: ACTION_SET_ACTIVITY_INDICATOR,

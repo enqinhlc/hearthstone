@@ -11,7 +11,6 @@ import {
   Platform,
 } from 'react-native';
 import CText from './CText';
-// import AsyncStorage from '@react-native-community/async-storage';
 import { SingleCard } from '../utils/Api';
 import { COLORS } from '../utils/Constants';
 
@@ -80,7 +79,7 @@ export default class CardItem extends React.Component {
     }
 
     if (options.hasOwnProperty('html')) {
-      data = data.split('\\n').join(' ');
+      data = (data || '').split('\\n').join(' ');
       data = data.replace(/<\/?[^>]+(>|$)/g, '');
     }
 
